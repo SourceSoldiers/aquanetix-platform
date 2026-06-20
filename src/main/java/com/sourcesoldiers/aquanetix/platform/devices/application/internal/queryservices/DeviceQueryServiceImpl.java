@@ -5,6 +5,7 @@ import com.sourcesoldiers.aquanetix.platform.devices.domain.model.aggregates.Dev
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.entities.ThresholdConfiguration;
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.queries.GetAllDevicesQuery;
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.queries.GetDeviceByIdQuery;
+import com.sourcesoldiers.aquanetix.platform.devices.domain.model.queries.GetThresholdsByDeviceIdQuery;
 import com.sourcesoldiers.aquanetix.platform.devices.domain.repositories.DeviceRepository;
 import com.sourcesoldiers.aquanetix.platform.devices.domain.repositories.ThresholdConfigurationRepository;
 import org.springframework.stereotype.Service;
@@ -41,4 +42,7 @@ public class DeviceQueryServiceImpl implements DeviceQueryService {
         return deviceRepository.findAll();
     }
 
+     public List<ThresholdConfiguration> handle(GetThresholdsByDeviceIdQuery query) {
+         return thresholdConfigurationRepository.findByDeviceId(query.deviceId());
+     }
 }

@@ -4,6 +4,7 @@ import com.sourcesoldiers.aquanetix.platform.devices.application.commandservices
 import com.sourcesoldiers.aquanetix.platform.devices.application.queryservices.DeviceQueryService;
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.queries.GetAllDevicesQuery;
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.queries.GetDeviceByIdQuery;
+import com.sourcesoldiers.aquanetix.platform.devices.domain.model.queries.GetThresholdsByDeviceIdQuery;
 import com.sourcesoldiers.aquanetix.platform.devices.interfaces.rest.resources.CreateDeviceResource;
 import com.sourcesoldiers.aquanetix.platform.devices.interfaces.rest.resources.CreateThresholdResource;
 import com.sourcesoldiers.aquanetix.platform.devices.interfaces.rest.resources.DeviceResource;
@@ -89,6 +90,17 @@ public class DevicesController {
         var message = result.failure().orElseThrow();
         return ResponseEntity.badRequest().body(new ErrorBody(message));
     }
+
+    @GetMapping("/{deviceId}/thresholds")
+    @Operation(summary = "Get thresholds by device id", operationId = "GetThresholdsByDeviceId")
+    @ApiResponse(responseCode = "200", description = "Thresholds retrieved",
+            content = @Content(schema = @Schema(implementation = ThresholdResource.class)))
+    public ResponseEntity<List<ThresholdResource>> getThresholdsByDeviceId(@PathVariable Long deviceId) {
+        var thresholds = deviceQueryService.handle(new GetThresholdsByDeviceIdQuery(deviceId));
+        var resources = thresholds.stream().map(ThresholdResourceFromEntityAssembler::toResourceFromEntity).toList();
+        return ResponseEntity.ok(resources);
+    }
+
     /**
      * Minimal error payload returned for failed operations.
      *
