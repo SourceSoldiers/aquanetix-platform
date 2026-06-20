@@ -4,7 +4,6 @@ import com.sourcesoldiers.aquanetix.platform.devices.domain.model.aggregates.Dev
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.entities.ThresholdConfiguration;
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.queries.GetAllDevicesQuery;
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.queries.GetDeviceByIdQuery;
-import com.sourcesoldiers.aquanetix.platform.devices.domain.model.queries.GetThresholdsByDeviceIdQuery;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,11 +32,4 @@ public interface DeviceQueryService {
      */
     List<Device> handle(GetAllDevicesQuery query);
 
-    /**
-     * Retrieves every threshold configuration of a device.
-     *
-     * @param query query parameters
-     * @return thresholds configured for the device
-     */
-    List<ThresholdConfiguration> handle(GetThresholdsByDeviceIdQuery query);
 }
