@@ -5,6 +5,7 @@ import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.aggregates.
 import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.queries.GetAlertByIdQuery;
 import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.queries.GetAllAlertsQuery;
 import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.queries.GetAlertsByDeviceIdQuery;
+import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.queries.GetAlertsByStatusQuery;
 import com.sourcesoldiers.aquanetix.platform.monitoring.interfaces.rest.resources.AlertResource;
 import com.sourcesoldiers.aquanetix.platform.monitoring.interfaces.rest.transform.AlertResourceFromEntityAssembler;
 import io.swagger.v3.oas.annotations.Operation;
@@ -59,6 +60,19 @@ public class AlertsController {
     public ResponseEntity<List<AlertResource>> getAlertsByDeviceId(@PathVariable Long deviceId) {
         var getAlertsByDeviceIdQuery = new GetAlertsByDeviceIdQuery(deviceId);
         var alerts = alertQueryService.handle(getAlertsByDeviceIdQuery);
+
+        var alertResources = alerts.stream()
+                .map(AlertResourceFromEntityAssembler::toResourceFromEntity)
+                .toList();
+
+        return ResponseEntity.ok(alertResources);
+    }
+
+    @GetMapping("/status/{status}")
+    @Operation(summary = "Get alerts by status")
+    public ResponseEntity<List<AlertResource>> getAlertsByStatus(@PathVariable String status) {
+        var getAlertsByStatusQuery = new GetAlertsByStatusQuery(status);
+        var alerts = alertQueryService.handle(getAlertsByStatusQuery);
 
         var alertResources = alerts.stream()
                 .map(AlertResourceFromEntityAssembler::toResourceFromEntity)
