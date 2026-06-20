@@ -4,6 +4,7 @@ import com.sourcesoldiers.aquanetix.platform.monitoring.application.queryservice
 import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.aggregates.Alert;
 import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.queries.GetAlertByIdQuery;
 import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.queries.GetAllAlertsQuery;
+import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.queries.GetAlertsByDeviceIdQuery;
 import com.sourcesoldiers.aquanetix.platform.monitoring.interfaces.rest.resources.AlertResource;
 import com.sourcesoldiers.aquanetix.platform.monitoring.interfaces.rest.transform.AlertResourceFromEntityAssembler;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,27 +27,38 @@ public class AlertsController {
         this.alertQueryService = alertQueryService;
     }
 
-
-    @GetMapping("/{alertId}")
-    @Operation(summary = "Get alert by id")
-    public ResponseEntity<AlertResource> getAlertById(@PathVariable Long alertId) {
-        GetAlertByIdQuery query = new GetAlertByIdQuery(alertId);
-        Optional<Alert> alert = alertQueryService.handle(query);
-
-        if (alert.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        AlertResource alertResource = AlertResourceFromEntityAssembler.toResourceFromEntity(alert.get());
-        return ResponseEntity.ok(alertResource);
-    }
-
-
     @GetMapping
     @Operation(summary = "Get all alerts")
     public ResponseEntity<List<AlertResource>> getAllAlerts() {
         var getAllAlertsQuery = new GetAllAlertsQuery();
         var alerts = alertQueryService.handle(getAllAlertsQuery);
+
+        var alertResources = alerts.stream()
+                .map(AlertResourceFromEntityAssembler::toResourceFromEntity)
+                .toList();
+
+        return ResponseEntity.ok(alertResources);
+    }
+
+    @GetMapping("/{alertId}")
+    @Operation(summary = "Get alert by id")
+    public ResponseEntity<AlertResource> getAlertById(@PathVariable Long alertId) {
+        var getAlertByIdQuery = new GetAlertByIdQuery(alertId);
+        Optional<Alert> alert = alertQueryService.handle(getAlertByIdQuery);
+
+        if (alert.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        var alertResource = AlertResourceFromEntityAssembler.toResourceFromEntity(alert.get());
+        return ResponseEntity.ok(alertResource);
+    }
+
+    @GetMapping("/device/{deviceId}")
+    @Operation(summary = "Get alerts by device id")
+    public ResponseEntity<List<AlertResource>> getAlertsByDeviceId(@PathVariable Long deviceId) {
+        var getAlertsByDeviceIdQuery = new GetAlertsByDeviceIdQuery(deviceId);
+        var alerts = alertQueryService.handle(getAlertsByDeviceIdQuery);
 
         var alertResources = alerts.stream()
                 .map(AlertResourceFromEntityAssembler::toResourceFromEntity)
