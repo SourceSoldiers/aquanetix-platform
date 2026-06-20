@@ -2,6 +2,7 @@ package com.sourcesoldiers.aquanetix.platform.devices.interfaces.rest;
 
 import com.sourcesoldiers.aquanetix.platform.devices.application.commandservices.DeviceCommandService;
 import com.sourcesoldiers.aquanetix.platform.devices.application.queryservices.DeviceQueryService;
+import com.sourcesoldiers.aquanetix.platform.devices.domain.model.queries.GetAllDevicesQuery;
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.queries.GetDeviceByIdQuery;
 import com.sourcesoldiers.aquanetix.platform.devices.interfaces.rest.resources.CreateDeviceResource;
 import com.sourcesoldiers.aquanetix.platform.devices.interfaces.rest.resources.CreateThresholdResource;
@@ -58,6 +59,17 @@ public class DevicesController {
             return ResponseEntity.ok(DeviceResourceFromEntityAssembler.toResourceFromEntity(device.get()));
         }
         return ResponseEntity.status(404).body(new ErrorBody("Device with id " + deviceId + " not found"));
+    }
+
+
+    @GetMapping
+    @Operation(summary = "Get all devices", operationId = "GetAllDevices")
+    @ApiResponse(responseCode = "200", description = "Devices retrieved",
+            content = @Content(schema = @Schema(implementation = DeviceResource.class)))
+    public ResponseEntity<List<DeviceResource>> getAllDevices() {
+        var devices = deviceQueryService.handle(new GetAllDevicesQuery());
+        var resources = devices.stream().map(DeviceResourceFromEntityAssembler::toResourceFromEntity).toList();
+        return ResponseEntity.ok(resources);
     }
     /**
      * Minimal error payload returned for failed operations.

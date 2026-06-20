@@ -2,6 +2,7 @@ package com.sourcesoldiers.aquanetix.platform.devices.application.queryservices;
 
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.aggregates.Device;
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.entities.ThresholdConfiguration;
+import com.sourcesoldiers.aquanetix.platform.devices.domain.model.queries.GetAllDevicesQuery;
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.queries.GetDeviceByIdQuery;
 
 import java.util.List;
@@ -22,4 +23,13 @@ public interface DeviceQueryService {
      * @return the device, when found
      */
     Optional<Device> handle(GetDeviceByIdQuery query);
+
+    /**
+     * Retrieves every registered device.
+     *
+     * @param query query parameters
+     * @return all devices
+     */
+    List<Device> handle(GetAllDevicesQuery query);
+
 }
