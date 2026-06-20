@@ -1,5 +1,6 @@
 package com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.aggregates;
 
+import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.commands.CreateAlertCommand;
 import jakarta.persistence.*;
 import lombok.Getter;
 import java.time.LocalDateTime;
@@ -10,7 +11,7 @@ import java.time.LocalDateTime;
 public class Alert {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Equivalente al AUTO_INCREMENT
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "device_id", nullable = false)
@@ -49,9 +50,7 @@ public class Alert {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-
     protected Alert() {}
-
 
     public Alert(Long deviceId, String deviceName, String location, String type,
                  String severity, String message, Double value, Double threshold) {
@@ -64,13 +63,29 @@ public class Alert {
         this.value = value;
         this.threshold = threshold;
 
-
         this.status = "ACTIVE";
         this.timestamp = LocalDateTime.now();
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
 
+
+    public Alert(CreateAlertCommand command) {
+        this.deviceId = command.deviceId();
+        this.deviceName = command.deviceName();
+        this.location = command.location();
+        this.type = command.type();
+        this.severity = command.severity();
+        this.message = command.message();
+        this.value = command.value();
+        this.threshold = command.threshold();
+
+
+        this.status = "ACTIVE";
+        this.timestamp = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
 
     public void resolve() {
         this.status = "RESOLVED";
