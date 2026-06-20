@@ -4,7 +4,8 @@ import com.sourcesoldiers.aquanetix.platform.monitoring.application.queryservice
 import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.aggregates.Alert;
 import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.queries.GetAlertByIdQuery;
 import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.queries.GetAllAlertsQuery;
-import com.sourcesoldiers.aquanetix.platform.monitoring.domain.repositories.AlertRepository; // Ruta corregida aquí
+import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.queries.GetAlertsByDeviceIdQuery;
+import com.sourcesoldiers.aquanetix.platform.monitoring.domain.repositories.AlertRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,5 +28,10 @@ public class AlertQueryServiceImpl implements AlertQueryService {
     @Override
     public List<Alert> handle(GetAllAlertsQuery query) {
         return alertRepository.findAll();
+    }
+
+    @Override
+    public List<Alert> handle(GetAlertsByDeviceIdQuery query) {
+        return alertRepository.findAllByDeviceId(query.deviceId());
     }
 }
