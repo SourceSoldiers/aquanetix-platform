@@ -2,6 +2,7 @@ package com.sourcesoldiers.aquanetix.platform.devices.application.commandservice
 
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.aggregates.Device;
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.commands.CreateDeviceCommand;
+import com.sourcesoldiers.aquanetix.platform.devices.domain.model.commands.CreateThresholdCommand;
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.entities.ThresholdConfiguration;
 import com.sourcesoldiers.aquanetix.platform.shared.application.result.Result;
 
@@ -21,4 +22,11 @@ public interface DeviceCommandService {
      */
     Result<Device, String> handle(CreateDeviceCommand command);
 
+    /**
+     * Creates a new threshold configuration for a device's sensor.
+     *
+     * @param command threshold creation data
+     * @return the created threshold, or a failure message
+     */
+    Result<ThresholdConfiguration, String> handle(CreateThresholdCommand command);
 }
