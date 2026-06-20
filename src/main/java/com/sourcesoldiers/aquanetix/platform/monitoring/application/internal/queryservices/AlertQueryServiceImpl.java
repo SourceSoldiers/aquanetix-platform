@@ -5,6 +5,7 @@ import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.aggregates.
 import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.queries.GetAlertByIdQuery;
 import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.queries.GetAllAlertsQuery;
 import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.queries.GetAlertsByDeviceIdQuery;
+import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.queries.GetAlertsByStatusQuery;
 import com.sourcesoldiers.aquanetix.platform.monitoring.domain.repositories.AlertRepository;
 import org.springframework.stereotype.Service;
 
@@ -33,5 +34,10 @@ public class AlertQueryServiceImpl implements AlertQueryService {
     @Override
     public List<Alert> handle(GetAlertsByDeviceIdQuery query) {
         return alertRepository.findAllByDeviceId(query.deviceId());
+    }
+
+    @Override
+    public List<Alert> handle(GetAlertsByStatusQuery query) {
+        return alertRepository.findAllByStatus(query.status());
     }
 }
