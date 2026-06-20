@@ -9,6 +9,7 @@ import com.sourcesoldiers.aquanetix.platform.devices.interfaces.rest.resources.C
 import com.sourcesoldiers.aquanetix.platform.devices.interfaces.rest.resources.DeviceResource;
 import com.sourcesoldiers.aquanetix.platform.devices.interfaces.rest.resources.ThresholdResource;
 import com.sourcesoldiers.aquanetix.platform.devices.interfaces.rest.resources.UpdateDeviceResource;
+import com.sourcesoldiers.aquanetix.platform.devices.interfaces.rest.transform.CreateDeviceCommandFromResourceAssembler;
 import com.sourcesoldiers.aquanetix.platform.devices.interfaces.rest.transform.DeviceResourceFromEntityAssembler;
 import com.sourcesoldiers.aquanetix.platform.devices.interfaces.rest.transform.ThresholdResourceFromEntityAssembler;
 import io.swagger.v3.oas.annotations.Operation;
@@ -70,6 +71,23 @@ public class DevicesController {
         var devices = deviceQueryService.handle(new GetAllDevicesQuery());
         var resources = devices.stream().map(DeviceResourceFromEntityAssembler::toResourceFromEntity).toList();
         return ResponseEntity.ok(resources);
+    }
+
+    @PostMapping
+    @Operation(summary = "Register a new device", operationId = "CreateDevice")
+    @ApiResponse(responseCode = "201", description = "Device created",
+            content = @Content(schema = @Schema(implementation = DeviceResource.class)))
+    @ApiResponse(responseCode = "400", description = "Invalid device data")
+    public ResponseEntity<?> createDevice(@Valid @RequestBody CreateDeviceResource resource) {
+        var command = CreateDeviceCommandFromResourceAssembler.toCommandFromResource(resource);
+        var result = deviceCommandService.handle(command);
+        if (result.isSuccess()) {
+            var device = result.success().orElseThrow();
+            var deviceResource = DeviceResourceFromEntityAssembler.toResourceFromEntity(device);
+            return ResponseEntity.created(URI.create("/api/v1/devices/" + device.getId())).body(deviceResource);
+        }
+        var message = result.failure().orElseThrow();
+        return ResponseEntity.badRequest().body(new ErrorBody(message));
     }
     /**
      * Minimal error payload returned for failed operations.
