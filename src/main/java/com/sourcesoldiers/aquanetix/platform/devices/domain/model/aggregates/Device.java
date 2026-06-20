@@ -1,6 +1,5 @@
 package com.sourcesoldiers.aquanetix.platform.devices.domain.model.aggregates;
 
-import com.sourcesoldiers.aquanetix.platform.devices.domain.model.commands.UpdateDeviceCommand;
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.entities.ThresholdConfiguration;
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.valueobjects.DeviceStatus;
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.valueobjects.DeviceType;
@@ -87,12 +86,6 @@ public class Device {
     public void addThreshold(ThresholdConfiguration threshold) {
         threshold.assignToDevice(this);
         this.thresholds.add(threshold);
-    }
-
-    /** Updates the device monitoring status and last telemetry sync timestamp. */
-    public void update(UpdateDeviceCommand command) {
-        this.currentStatus = command.currentStatus();
-        this.lastTelemetrySync = command.lastTelemetrySync();
     }
 
     public Long getId() {
