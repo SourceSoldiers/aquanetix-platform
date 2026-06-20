@@ -3,6 +3,7 @@ package com.sourcesoldiers.aquanetix.platform.monitoring.interfaces.rest;
 import com.sourcesoldiers.aquanetix.platform.monitoring.application.commandservices.AlertCommandService;
 import com.sourcesoldiers.aquanetix.platform.monitoring.application.queryservices.AlertQueryService;
 import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.aggregates.Alert;
+import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.commands.ResolveAlertCommand;
 import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.queries.GetAlertByIdQuery;
 import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.queries.GetAllAlertsQuery;
 import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.queries.GetAlertsByDeviceIdQuery;
@@ -99,5 +100,19 @@ public class AlertsController {
                 .toList();
 
         return ResponseEntity.ok(alertResources);
+    }
+
+    @PutMapping("/{alertId}")
+    @Operation(summary = "Update an alert (resolve)")
+    public ResponseEntity<AlertResource> resolveAlert(@PathVariable Long alertId) {
+        var resolveAlertCommand = new ResolveAlertCommand(alertId);
+        var alert = alertCommandService.handle(resolveAlertCommand);
+
+        if (alert.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        var alertResource = AlertResourceFromEntityAssembler.toResourceFromEntity(alert.get());
+        return ResponseEntity.ok(alertResource);
     }
 }
