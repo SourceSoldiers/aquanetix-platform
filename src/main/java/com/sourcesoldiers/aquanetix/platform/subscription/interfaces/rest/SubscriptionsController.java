@@ -12,7 +12,7 @@ import com.sourcesoldiers.aquanetix.platform.subscription.domain.model.aggregate
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
-
+import com.sourcesoldiers.aquanetix.platform.subscription.domain.model.commands.CancelSubscriptionCommand;
 import java.util.Optional;
 
 @RestController
@@ -70,5 +70,25 @@ public class SubscriptionsController {
         return new ResponseEntity<>(
                 subscriptionResource,
                 HttpStatus.CREATED);
+    }
+    @PutMapping("/{id}/cancel")
+    @Operation(summary = "Cancel subscription")
+    public ResponseEntity<SubscriptionResource> cancelSubscription(
+            @PathVariable Long id) {
+
+        var command = new CancelSubscriptionCommand(id);
+
+        var subscription =
+                subscriptionCommandService.handle(command);
+
+        if (subscription.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        var resource =
+                SubscriptionResourceFromEntityAssembler
+                        .toResourceFromEntity(subscription.get());
+
+        return ResponseEntity.ok(resource);
     }
 }
