@@ -30,7 +30,7 @@ import java.util.List;
  * @since 1.0
  */
 @Entity
-@Table(name = "devices")
+@Table(name = "device")
 @NoArgsConstructor(force = true)
 public class Device {
 

@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
  * @since 1.0
  */
 @Entity
-@Table(name = "threshold_configurations")
+@Table(name = "threshold_configuration")
 @NoArgsConstructor(force = true)
 public class ThresholdConfiguration {
 
