@@ -1,5 +1,6 @@
 package com.sourcesoldiers.aquanetix.platform.monitoring.interfaces.rest;
 
+import com.sourcesoldiers.aquanetix.platform.monitoring.application.commandservices.AlertCommandService;
 import com.sourcesoldiers.aquanetix.platform.monitoring.application.queryservices.AlertQueryService;
 import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.aggregates.Alert;
 import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.queries.GetAlertByIdQuery;
@@ -7,9 +8,12 @@ import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.queries.Get
 import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.queries.GetAlertsByDeviceIdQuery;
 import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.queries.GetAlertsByStatusQuery;
 import com.sourcesoldiers.aquanetix.platform.monitoring.interfaces.rest.resources.AlertResource;
+import com.sourcesoldiers.aquanetix.platform.monitoring.interfaces.rest.resources.CreateAlertResource;
 import com.sourcesoldiers.aquanetix.platform.monitoring.interfaces.rest.transform.AlertResourceFromEntityAssembler;
+import com.sourcesoldiers.aquanetix.platform.monitoring.interfaces.rest.transform.CreateAlertCommandFromResourceAssembler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,9 +27,25 @@ import java.util.Optional;
 public class AlertsController {
 
     private final AlertQueryService alertQueryService;
+    private final AlertCommandService alertCommandService;
 
-    public AlertsController(AlertQueryService alertQueryService) {
+    public AlertsController(AlertQueryService alertQueryService, AlertCommandService alertCommandService) {
         this.alertQueryService = alertQueryService;
+        this.alertCommandService = alertCommandService;
+    }
+
+    @PostMapping
+    @Operation(summary = "Create an alert")
+    public ResponseEntity<AlertResource> createAlert(@RequestBody CreateAlertResource resource) {
+        var createAlertCommand = CreateAlertCommandFromResourceAssembler.toCommandFromResource(resource);
+        var alert = alertCommandService.handle(createAlertCommand);
+
+        if (alert.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        var alertResource = AlertResourceFromEntityAssembler.toResourceFromEntity(alert.get());
+        return new ResponseEntity<>(alertResource, HttpStatus.CREATED);
     }
 
     @GetMapping
