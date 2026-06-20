@@ -11,6 +11,7 @@ import com.sourcesoldiers.aquanetix.platform.devices.interfaces.rest.resources.D
 import com.sourcesoldiers.aquanetix.platform.devices.interfaces.rest.resources.ThresholdResource;
 import com.sourcesoldiers.aquanetix.platform.devices.interfaces.rest.resources.UpdateDeviceResource;
 import com.sourcesoldiers.aquanetix.platform.devices.interfaces.rest.transform.CreateDeviceCommandFromResourceAssembler;
+import com.sourcesoldiers.aquanetix.platform.devices.interfaces.rest.transform.CreateThresholdCommandFromResourceAssembler;
 import com.sourcesoldiers.aquanetix.platform.devices.interfaces.rest.transform.DeviceResourceFromEntityAssembler;
 import com.sourcesoldiers.aquanetix.platform.devices.interfaces.rest.transform.ThresholdResourceFromEntityAssembler;
 import io.swagger.v3.oas.annotations.Operation;
@@ -100,7 +101,23 @@ public class DevicesController {
         var resources = thresholds.stream().map(ThresholdResourceFromEntityAssembler::toResourceFromEntity).toList();
         return ResponseEntity.ok(resources);
     }
-
+    @PostMapping("/{deviceId}/thresholds")
+    @Operation(summary = "Create a threshold for a device", operationId = "CreateThreshold")
+    @ApiResponse(responseCode = "201", description = "Threshold created",
+            content = @Content(schema = @Schema(implementation = ThresholdResource.class)))
+    @ApiResponse(responseCode = "404", description = "Device not found")
+    public ResponseEntity<?> createThreshold(@PathVariable Long deviceId,
+                                             @Valid @RequestBody CreateThresholdResource resource) {
+        var command = CreateThresholdCommandFromResourceAssembler.toCommandFromResource(resource, deviceId);
+        var result = deviceCommandService.handle(command);
+        if (result.isSuccess()) {
+            var threshold = result.success().orElseThrow();
+            return ResponseEntity.created(URI.create("/api/v1/devices/" + deviceId + "/thresholds"))
+                    .body(ThresholdResourceFromEntityAssembler.toResourceFromEntity(threshold));
+        }
+        var message = result.failure().orElseThrow();
+        return ResponseEntity.status(404).body(new ErrorBody(message));
+    }
     /**
      * Minimal error payload returned for failed operations.
      *

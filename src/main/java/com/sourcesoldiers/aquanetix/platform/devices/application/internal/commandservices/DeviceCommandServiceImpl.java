@@ -3,6 +3,7 @@ package com.sourcesoldiers.aquanetix.platform.devices.application.internal.comma
 import com.sourcesoldiers.aquanetix.platform.devices.application.commandservices.DeviceCommandService;
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.aggregates.Device;
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.commands.CreateDeviceCommand;
+import com.sourcesoldiers.aquanetix.platform.devices.domain.model.commands.CreateThresholdCommand;
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.entities.ThresholdConfiguration;
 import com.sourcesoldiers.aquanetix.platform.devices.domain.repositories.DeviceRepository;
 import com.sourcesoldiers.aquanetix.platform.shared.application.result.Result;
@@ -38,4 +39,27 @@ public class DeviceCommandServiceImpl implements DeviceCommandService {
         }
     }
 
+
+    @Override
+    @Transactional
+    public Result<ThresholdConfiguration, String> handle(CreateThresholdCommand command) {
+        var deviceOptional = deviceRepository.findById(command.deviceId());
+        if (deviceOptional.isEmpty()) {
+            return Result.failure("Device with id " + command.deviceId() + " was not found");
+        }
+        try {
+            var device = deviceOptional.get();
+            var threshold = new ThresholdConfiguration(
+                    command.deviceId().intValue(),
+                    command.minValue(),
+                    command.maxValue(),
+                    command.unit(),
+                    command.alertLevel());
+            device.addThreshold(threshold);
+            deviceRepository.save(device);
+            return Result.success(threshold);
+        } catch (Exception ex) {
+            return Result.failure("Could not create the threshold: " + ex.getMessage());
+        }
+    }
 }
