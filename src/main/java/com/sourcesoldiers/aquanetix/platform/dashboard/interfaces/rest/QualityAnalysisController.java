@@ -1,6 +1,7 @@
 package com.sourcesoldiers.aquanetix.platform.dashboard.interfaces.rest;
 
 import com.sourcesoldiers.aquanetix.platform.dashboard.application.queryservices.QualityAnalysisQueryService;
+import com.sourcesoldiers.aquanetix.platform.dashboard.domain.model.queries.GetAllQualityAnalysesQuery;
 import com.sourcesoldiers.aquanetix.platform.dashboard.domain.model.queries.GetQualityAnalysisByIdQuery;
 import com.sourcesoldiers.aquanetix.platform.dashboard.interfaces.rest.resources.QualityAnalysisResource;
 import com.sourcesoldiers.aquanetix.platform.dashboard.interfaces.rest.transform.QualityAnalysisResourceFromEntityAssembler;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
  * REST controller exposing the Dashboard bounded context endpoints.
  *
@@ -30,6 +33,18 @@ public class QualityAnalysisController {
 
     public QualityAnalysisController(QualityAnalysisQueryService qualityAnalysisQueryService) {
         this.qualityAnalysisQueryService = qualityAnalysisQueryService;
+    }
+
+    @GetMapping
+    @Operation(summary = "Get all quality analyses", operationId = "GetAllQualityAnalyses")
+    @ApiResponse(responseCode = "200", description = "Quality analyses retrieved",
+            content = @Content(schema = @Schema(implementation = QualityAnalysisResource.class)))
+    public ResponseEntity<List<QualityAnalysisResource>> getAllQualityAnalyses() {
+        var analyses = qualityAnalysisQueryService.handle(new GetAllQualityAnalysesQuery());
+        var resources = analyses.stream()
+                .map(QualityAnalysisResourceFromEntityAssembler::toResourceFromEntity)
+                .toList();
+        return ResponseEntity.ok(resources);
     }
 
     @GetMapping("/{analysisId}")
