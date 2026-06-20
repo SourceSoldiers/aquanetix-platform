@@ -3,16 +3,17 @@ package com.sourcesoldiers.aquanetix.platform.monitoring.application.internal.qu
 import com.sourcesoldiers.aquanetix.platform.monitoring.application.queryservices.AlertQueryService;
 import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.aggregates.Alert;
 import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.queries.GetAlertByIdQuery;
-import com.sourcesoldiers.aquanetix.platform.monitoring.domain.repositories.AlertRepository;
+import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.queries.GetAllAlertsQuery;
+import com.sourcesoldiers.aquanetix.platform.monitoring.domain.repositories.AlertRepository; // Ruta corregida aquí
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class AlertQueryServiceImpl implements AlertQueryService {
 
     private final AlertRepository alertRepository;
-
 
     public AlertQueryServiceImpl(AlertRepository alertRepository) {
         this.alertRepository = alertRepository;
@@ -21,5 +22,10 @@ public class AlertQueryServiceImpl implements AlertQueryService {
     @Override
     public Optional<Alert> handle(GetAlertByIdQuery query) {
         return alertRepository.findById(query.alertId());
+    }
+
+    @Override
+    public List<Alert> handle(GetAllAlertsQuery query) {
+        return alertRepository.findAll();
     }
 }
