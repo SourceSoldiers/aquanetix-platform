@@ -1,4 +1,4 @@
-﻿package com.sourcesoldiers.aquanetix.platform.subscription.domain.model.commands;
+package com.sourcesoldiers.aquanetix.platform.subscription.domain.model.commands;
 
 public record CreateSubscriptionCommand(
         Integer userId,
