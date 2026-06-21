@@ -6,11 +6,10 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # 2. Etapa de ejecución (Run)
-FROM eclipse-temurin-17-jre
+# 2. Etapa de ejecución (Run)
+FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
-EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
 
 #FROM eclipse-temurin:26-jre
 #WORKDIR /app
