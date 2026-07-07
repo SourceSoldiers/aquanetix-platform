@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/v1/service-designs")
-@Tag(name = "WaterBatches")
+@RequestMapping("/api/v1/water-batches") // Opcional: si también deseas actualizar la ruta de la API
+@Tag(name = "WaterBatches", description = "WaterBatches")
 public class ServiceDesignController {
 
     private final ServiceDesignRepository serviceDesignRepository;
