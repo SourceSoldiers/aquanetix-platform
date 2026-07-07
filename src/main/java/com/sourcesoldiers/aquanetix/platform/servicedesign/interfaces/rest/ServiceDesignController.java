@@ -6,6 +6,7 @@ import com.sourcesoldiers.aquanetix.platform.servicedesign.domain.repositories.S
 import com.sourcesoldiers.aquanetix.platform.servicedesign.interfaces.rest.resources.CreateServiceDesignResource;
 import com.sourcesoldiers.aquanetix.platform.servicedesign.interfaces.rest.transform.CreateServiceDesignCommandFromResourceAssembler;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +14,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/service-designs")
+@Tag(name = "WaterBatches")
 public class ServiceDesignController {
 
     private final ServiceDesignRepository serviceDesignRepository;
