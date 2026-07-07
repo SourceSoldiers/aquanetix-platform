@@ -1,15 +1,18 @@
-# --- Paso 1: Compilar la aplicación ---
-FROM maven:3.9.6-eclipse-temurin-26 AS build
+# --- Paso 1: Compilar la aplicación usando el JDK 26 oficial ---
+FROM eclipse-temurin:26-jdk AS build
 WORKDIR /app
 
-# Copiar el archivo de configuración de Maven y el código fuente
+# Instalar Maven dentro del contenedor de compilación
+RUN apt-get update && apt-get install -y maven
+
+# Copiar archivos del proyecto
 COPY pom.xml .
 COPY src ./src
 
-# Compilar el proyecto saltándose los tests (para agilizar el despliegue)
+# Compilar y generar el .jar
 RUN mvn clean package -DskipTests
 
-# --- Paso 2: Crear la imagen de ejecución ---
+# --- Paso 2: Crear la imagen final de ejecución ligera ---
 FROM eclipse-temurin:26-jre
 WORKDIR /app
 
