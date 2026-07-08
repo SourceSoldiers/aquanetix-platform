@@ -54,7 +54,7 @@ public class UserCommandServiceImpl implements UserCommandService {
         return Result.success(ImmutablePair.of(user.get(), token));
     }
     */
-    /*
+
     @Override
     @Transactional
     public Result<User, ApplicationError> handle(SignUpCommand command) {
@@ -83,5 +83,5 @@ public class UserCommandServiceImpl implements UserCommandService {
                 .<Result<User, ApplicationError>>map(Result::success)
                 .orElseGet(() -> Result.failure(ApplicationError.unexpected("sign-up", "Created user could not be reloaded")));
     }
-     */
+
 }

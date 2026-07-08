@@ -33,7 +33,7 @@ public class IamContextFacade {
      * @param password raw password
      * @return created user identifier, or {@code 0L} when creation fails
      */
-    /*
+
     public Long createUser(String username, String password) {
         var signUpCommand = new SignUpCommand(username, password, List.of(Role.getDefaultRole()));
         var result = userCommandService.handle(signUpCommand);
@@ -42,7 +42,7 @@ public class IamContextFacade {
         }
         return 0L;
     }
-    */
+
     /**
      * Creates a new user with explicit role names.
      *
@@ -51,7 +51,7 @@ public class IamContextFacade {
      * @param roleNames role names to assign; unknown names are ignored
      * @return created user identifier, or {@code 0L} when creation fails
      */
-    /*
+
     public Long createUser(String username, String password, List<String> roleNames) {
         var roles = roleNames != null ? roleNames.stream().map(Role::toRoleFromName).toList() : new ArrayList<Role>();
         var signUpCommand = new SignUpCommand(username, password, roles);
@@ -61,7 +61,7 @@ public class IamContextFacade {
         }
         return 0L;
     }
-    */
+
     /**
      * Fetches the identifier for a username.
      *
