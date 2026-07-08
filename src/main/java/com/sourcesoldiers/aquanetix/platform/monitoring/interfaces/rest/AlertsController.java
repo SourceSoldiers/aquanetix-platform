@@ -3,15 +3,16 @@ package com.sourcesoldiers.aquanetix.platform.monitoring.interfaces.rest;
 import com.sourcesoldiers.aquanetix.platform.monitoring.application.commandservices.AlertCommandService;
 import com.sourcesoldiers.aquanetix.platform.monitoring.application.queryservices.AlertQueryService;
 import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.aggregates.Alert;
-import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.commands.ResolveAlertCommand;
 import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.queries.GetAlertByIdQuery;
 import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.queries.GetAllAlertsQuery;
 import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.queries.GetAlertsByDeviceIdQuery;
 import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.queries.GetAlertsByStatusQuery;
 import com.sourcesoldiers.aquanetix.platform.monitoring.interfaces.rest.resources.AlertResource;
 import com.sourcesoldiers.aquanetix.platform.monitoring.interfaces.rest.resources.CreateAlertResource;
+import com.sourcesoldiers.aquanetix.platform.monitoring.interfaces.rest.resources.UpdateAlertResource;
 import com.sourcesoldiers.aquanetix.platform.monitoring.interfaces.rest.transform.AlertResourceFromEntityAssembler;
 import com.sourcesoldiers.aquanetix.platform.monitoring.interfaces.rest.transform.CreateAlertCommandFromResourceAssembler;
+import com.sourcesoldiers.aquanetix.platform.monitoring.interfaces.rest.transform.UpdateAlertCommandFromResourceAssembler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
@@ -36,7 +37,7 @@ public class AlertsController {
     }
 
     @PostMapping
-    @Operation(summary = "Create an alert")
+    @Operation(summary = "Create an alert", operationId = "CreateAlert")
     public ResponseEntity<AlertResource> createAlert(@RequestBody CreateAlertResource resource) {
         var createAlertCommand = CreateAlertCommandFromResourceAssembler.toCommandFromResource(resource);
         var alert = alertCommandService.handle(createAlertCommand);
@@ -50,7 +51,7 @@ public class AlertsController {
     }
 
     @GetMapping
-    @Operation(summary = "Get all alerts")
+    @Operation(summary = "Get all alerts", operationId = "GetAllAlerts")
     public ResponseEntity<List<AlertResource>> getAllAlerts() {
         var getAllAlertsQuery = new GetAllAlertsQuery();
         var alerts = alertQueryService.handle(getAllAlertsQuery);
@@ -63,7 +64,7 @@ public class AlertsController {
     }
 
     @GetMapping("/{alertId}")
-    @Operation(summary = "Get alert by id")
+    @Operation(summary = "Get alert by id", operationId = "GetAlertById")
     public ResponseEntity<AlertResource> getAlertById(@PathVariable Long alertId) {
         var getAlertByIdQuery = new GetAlertByIdQuery(alertId);
         Optional<Alert> alert = alertQueryService.handle(getAlertByIdQuery);
@@ -77,7 +78,7 @@ public class AlertsController {
     }
 
     @GetMapping("/device/{deviceId}")
-    @Operation(summary = "Get alerts by device id")
+    @Operation(summary = "Get alerts by device id", operationId = "GetAlertsByDeviceId")
     public ResponseEntity<List<AlertResource>> getAlertsByDeviceId(@PathVariable Long deviceId) {
         var getAlertsByDeviceIdQuery = new GetAlertsByDeviceIdQuery(deviceId);
         var alerts = alertQueryService.handle(getAlertsByDeviceIdQuery);
@@ -90,7 +91,7 @@ public class AlertsController {
     }
 
     @GetMapping("/status/{status}")
-    @Operation(summary = "Get alerts by status")
+    @Operation(summary = "Get alerts by status", operationId = "GetAlertsByStatus")
     public ResponseEntity<List<AlertResource>> getAlertsByStatus(@PathVariable String status) {
         var getAlertsByStatusQuery = new GetAlertsByStatusQuery(status);
         var alerts = alertQueryService.handle(getAlertsByStatusQuery);
@@ -103,10 +104,11 @@ public class AlertsController {
     }
 
     @PutMapping("/{alertId}")
-    @Operation(summary = "Update an alert (resolve)")
-    public ResponseEntity<AlertResource> resolveAlert(@PathVariable Long alertId) {
-        var resolveAlertCommand = new ResolveAlertCommand(alertId);
-        var alert = alertCommandService.handle(resolveAlertCommand);
+    @Operation(summary = "Update an alert (resolve)", operationId = "UpdateAlert")
+    public ResponseEntity<AlertResource> resolveAlert(@PathVariable Long alertId,
+                                                      @RequestBody UpdateAlertResource resource) {
+        var updateAlertCommand = UpdateAlertCommandFromResourceAssembler.toCommandFromResource(resource, alertId);
+        var alert = alertCommandService.handle(updateAlertCommand);
 
         if (alert.isEmpty()) {
             return ResponseEntity.notFound().build();

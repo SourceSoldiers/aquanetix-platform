@@ -5,6 +5,7 @@ import com.sourcesoldiers.aquanetix.platform.iam.application.queries.GetUserById
 import com.sourcesoldiers.aquanetix.platform.iam.application.queryservices.UserQueryService;
 import com.sourcesoldiers.aquanetix.platform.iam.interfaces.rest.resources.UserResource;
 import com.sourcesoldiers.aquanetix.platform.iam.interfaces.rest.transform.UserResourceFromEntityAssembler;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -28,6 +29,7 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/api/v1/users", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Users", description = "User management endpoints")
+@Hidden
 public class UsersController {
     private final UserQueryService userQueryService;
 

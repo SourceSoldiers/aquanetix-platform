@@ -6,18 +6,18 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * Resource received to authenticate an existing user.
  */
 @Schema(
-        name = "SignInRequest",
+        name = "SignInResource",
         description = "User sign-in request with credentials",
-        example = "{\"username\": \"john.doe\", \"password\": \"SecurePass123!\"}"
+        example = "{\"email\": \"john.doe@example.com\", \"password\": \"SecurePass123!\"}"
 )
 public record SignInResource(
         @Schema(
-                description = "Username",
-                example = "john.doe",
+                description = "User email",
+                example = "john.doe@example.com",
                 minLength = 3,
                 maxLength = 50
         )
-        String username,
+        String email,
 
         @Schema(
                 description = "User password",

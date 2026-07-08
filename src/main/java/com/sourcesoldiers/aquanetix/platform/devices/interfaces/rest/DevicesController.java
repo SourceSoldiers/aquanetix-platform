@@ -3,6 +3,7 @@ package com.sourcesoldiers.aquanetix.platform.devices.interfaces.rest;
 import com.sourcesoldiers.aquanetix.platform.devices.application.commandservices.DeviceCommandService;
 import com.sourcesoldiers.aquanetix.platform.devices.application.queryservices.DeviceQueryService;
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.queries.GetAllDevicesQuery;
+import com.sourcesoldiers.aquanetix.platform.devices.domain.model.commands.DeleteDeviceCommand;
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.queries.GetDeviceByIdQuery;
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.queries.GetThresholdsByDeviceIdQuery;
 import com.sourcesoldiers.aquanetix.platform.devices.interfaces.rest.resources.CreateDeviceResource;
@@ -14,6 +15,7 @@ import com.sourcesoldiers.aquanetix.platform.devices.interfaces.rest.transform.C
 import com.sourcesoldiers.aquanetix.platform.devices.interfaces.rest.transform.CreateThresholdCommandFromResourceAssembler;
 import com.sourcesoldiers.aquanetix.platform.devices.interfaces.rest.transform.DeviceResourceFromEntityAssembler;
 import com.sourcesoldiers.aquanetix.platform.devices.interfaces.rest.transform.ThresholdResourceFromEntityAssembler;
+import com.sourcesoldiers.aquanetix.platform.devices.interfaces.rest.transform.UpdateDeviceCommandFromResourceAssembler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -29,6 +31,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.net.URI;
 import java.util.List;
@@ -76,7 +79,7 @@ public class DevicesController {
     }
 
     @PostMapping
-    @Operation(summary = "Register a new device", operationId = "CreateDevice")
+    @Operation(summary = "Create a new device", operationId = "CreateDevice")
     @ApiResponse(responseCode = "201", description = "Device created",
             content = @Content(schema = @Schema(implementation = DeviceResource.class)))
     @ApiResponse(responseCode = "400", description = "Invalid device data")
@@ -92,6 +95,23 @@ public class DevicesController {
         return ResponseEntity.badRequest().body(new ErrorBody(message));
     }
 
+    @PutMapping("/{deviceId}")
+    @Operation(summary = "Update device monitoring frequency", operationId = "UpdateDevice")
+    @ApiResponse(responseCode = "200", description = "Device updated",
+            content = @Content(schema = @Schema(implementation = DeviceResource.class)))
+    @ApiResponse(responseCode = "404", description = "Device not found")
+    public ResponseEntity<?> updateDevice(@PathVariable Long deviceId,
+                                          @Valid @RequestBody UpdateDeviceResource resource) {
+        var command = UpdateDeviceCommandFromResourceAssembler.toCommandFromResource(resource, deviceId);
+        var result = deviceCommandService.handle(command);
+        if (result.isSuccess()) {
+            var device = result.success().orElseThrow();
+            return ResponseEntity.ok(DeviceResourceFromEntityAssembler.toResourceFromEntity(device));
+        }
+        var message = result.failure().orElseThrow();
+        return ResponseEntity.status(404).body(new ErrorBody(message));
+    }
+
     @GetMapping("/{deviceId}/thresholds")
     @Operation(summary = "Get thresholds by device id", operationId = "GetThresholdsByDeviceId")
     @ApiResponse(responseCode = "200", description = "Thresholds retrieved",
@@ -102,7 +122,7 @@ public class DevicesController {
         return ResponseEntity.ok(resources);
     }
     @PostMapping("/{deviceId}/thresholds")
-    @Operation(summary = "Create a threshold for a device", operationId = "CreateThreshold")
+    @Operation(summary = "Create threshold for device", operationId = "CreateThreshold")
     @ApiResponse(responseCode = "201", description = "Threshold created",
             content = @Content(schema = @Schema(implementation = ThresholdResource.class)))
     @ApiResponse(responseCode = "404", description = "Device not found")
@@ -114,6 +134,19 @@ public class DevicesController {
             var threshold = result.success().orElseThrow();
             return ResponseEntity.created(URI.create("/api/v1/devices/" + deviceId + "/thresholds"))
                     .body(ThresholdResourceFromEntityAssembler.toResourceFromEntity(threshold));
+        }
+        var message = result.failure().orElseThrow();
+        return ResponseEntity.status(404).body(new ErrorBody(message));
+    }
+
+    @DeleteMapping("/{deviceId}")
+    @Operation(summary = "Delete a device and its alerts and thresholds", operationId = "DeleteDevice")
+    @ApiResponse(responseCode = "204", description = "Device deleted")
+    @ApiResponse(responseCode = "404", description = "Device not found")
+    public ResponseEntity<?> deleteDevice(@PathVariable Long deviceId) {
+        var result = deviceCommandService.handle(new DeleteDeviceCommand(deviceId));
+        if (result.isSuccess()) {
+            return ResponseEntity.noContent().build();
         }
         var message = result.failure().orElseThrow();
         return ResponseEntity.status(404).body(new ErrorBody(message));

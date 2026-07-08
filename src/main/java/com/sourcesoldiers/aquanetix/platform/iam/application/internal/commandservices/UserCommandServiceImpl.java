@@ -13,6 +13,9 @@ import com.sourcesoldiers.aquanetix.platform.iam.domain.repositories.RoleReposit
 import com.sourcesoldiers.aquanetix.platform.iam.domain.repositories.UserRepository;
 import com.sourcesoldiers.aquanetix.platform.shared.application.result.ApplicationError;
 import com.sourcesoldiers.aquanetix.platform.shared.application.result.Result;
+import com.sourcesoldiers.aquanetix.platform.subscription.application.commandservices.SubscriptionCommandService;
+import com.sourcesoldiers.aquanetix.platform.subscription.domain.model.commands.CreateSubscriptionCommand;
+import com.sourcesoldiers.aquanetix.platform.subscription.domain.model.valueobjects.PlanCatalog;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,41 +30,59 @@ public class UserCommandServiceImpl implements UserCommandService {
     private final HashingService hashingService;
     private final TokenService tokenService;
     private final RoleRepository roleRepository;
+    private final SubscriptionCommandService subscriptionCommandService;
 
     public UserCommandServiceImpl(
             UserRepository userRepository,
             HashingService hashingService,
             TokenService tokenService,
-            RoleRepository roleRepository) {
+            RoleRepository roleRepository,
+            SubscriptionCommandService subscriptionCommandService) {
         this.userRepository = userRepository;
         this.hashingService = hashingService;
         this.tokenService = tokenService;
         this.roleRepository = roleRepository;
+        this.subscriptionCommandService = subscriptionCommandService;
     }
 
     @Override
     @Transactional
     public Result<ImmutablePair<User, String>, ApplicationError> handle(SignInCommand command) {
-        var user = userRepository.findByUsername(command.username());
+        if (command.email() == null || command.email().isBlank() ||
+                command.password() == null || command.password().isBlank()) {
+            return Result.failure(ApplicationError.validationError("credentials", "Invalid email or password"));
+        }
+
+        var email = command.email().trim().toLowerCase();
+        var user = userRepository.findByUsername(email);
         if (user.isEmpty()) {
-            return Result.failure(ApplicationError.notFound("User", command.username()));
+            return Result.failure(ApplicationError.validationError("credentials", "Invalid email or password"));
         }
         if (!hashingService.matches(command.password(), user.get().getPasswordHash().value())) {
-            return Result.failure(ApplicationError.validationError("credentials", "Invalid username or password"));
+            return Result.failure(ApplicationError.validationError("credentials", "Invalid email or password"));
         }
-        var token = tokenService.generateToken(user.get().getUsername());
+        var token = tokenService.generateToken(user.get().getEmail());
         return Result.success(ImmutablePair.of(user.get(), token));
     }
 
     @Override
     @Transactional
-    public Result<User, ApplicationError> handle(SignUpCommand command) {
-        if (userRepository.existsByUsername(command.username())) {
-            return Result.failure(ApplicationError.conflict("User", "Username already exists"));
+    public Result<ImmutablePair<User, String>, ApplicationError> handle(SignUpCommand command) {
+        if (command.email() == null || command.email().isBlank() ||
+                command.password() == null || command.password().isBlank()) {
+            return Result.failure(ApplicationError.validationError("credentials", "Email and password are required"));
         }
-        var requestedRoles = command.roles() == null || command.roles().isEmpty()
-                ? java.util.List.of(Role.getDefaultRole())
-                : command.roles();
+
+        if (!PlanCatalog.isValidPlan(command.plan())) {
+            return Result.failure(ApplicationError.validationError("plan", "Invalid plan. Choose Basic, Smart City or Industrial"));
+        }
+
+        var email = command.email().trim().toLowerCase();
+
+        if (userRepository.existsByUsername(email)) {
+            return Result.failure(ApplicationError.conflict("User", "A user with that email already exists"));
+        }
+        var requestedRoles = java.util.List.of(Role.getDefaultRole());
 
         var roles = requestedRoles.stream()
                 .map(role -> roleRepository.findByName(role.getName()))
@@ -75,11 +96,18 @@ public class UserCommandServiceImpl implements UserCommandService {
                 .map(java.util.Optional::get)
                 .toList();
 
-        var user = User.create(command.username(), PasswordHash.of(hashingService.encode(command.password())), resolvedRoles);
-        userRepository.save(user);
-        return userRepository.findByUsername(command.username())
-                .<Result<User, ApplicationError>>map(Result::success)
-                .orElseGet(() -> Result.failure(ApplicationError.unexpected("sign-up", "Created user could not be reloaded")));
+        var user = User.create(email, PasswordHash.of(hashingService.encode(command.password())), resolvedRoles);
+        var saved = userRepository.save(user);
+        var subscription = subscriptionCommandService.handle(
+                new CreateSubscriptionCommand(saved.getId().intValue(), command.plan(), "Active"));
+
+        if (subscription.isEmpty()) {
+            return Result.failure(ApplicationError.validationError("plan", "Invalid plan. Choose Basic, Smart City or Industrial"));
+        }
+
+        var token = tokenService.generateToken(saved.getEmail());
+
+        return Result.success(ImmutablePair.of(saved, token));
     }
 
 }

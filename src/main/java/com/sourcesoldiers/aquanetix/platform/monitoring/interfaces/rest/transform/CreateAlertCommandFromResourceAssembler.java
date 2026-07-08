@@ -12,6 +12,8 @@ public class CreateAlertCommandFromResourceAssembler {
                 resource.type(),
                 resource.severity(),
                 resource.message(),
+                resource.timestamp(),
+                resource.status(),
                 resource.value(),
                 resource.threshold()
         );

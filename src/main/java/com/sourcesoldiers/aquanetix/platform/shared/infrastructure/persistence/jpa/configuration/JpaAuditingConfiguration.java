@@ -1,7 +1,13 @@
 package com.sourcesoldiers.aquanetix.platform.shared.infrastructure.persistence.jpa.configuration;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.auditing.DateTimeProvider;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+
+import java.time.OffsetDateTime;
+import java.time.temporal.TemporalAccessor;
+import java.util.Optional;
 
 /**
  * Activates Spring Data JPA auditing for the whole application.
@@ -18,6 +24,10 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
  * insert and its {@code updatedAt} refreshed on every save.</p>
  */
 @Configuration
-@EnableJpaAuditing
+@EnableJpaAuditing(dateTimeProviderRef = "auditingDateTimeProvider")
 public class JpaAuditingConfiguration {
+    @Bean
+    public DateTimeProvider auditingDateTimeProvider() {
+        return () -> Optional.<TemporalAccessor>of(OffsetDateTime.now());
+    }
 }

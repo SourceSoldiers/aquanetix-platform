@@ -1,5 +1,7 @@
 package com.sourcesoldiers.aquanetix.platform.monitoring.interfaces.rest.resources;
 
+import java.time.OffsetDateTime;
+
 public record AlertResource(
         Long id,
         Long deviceId,
@@ -8,7 +10,7 @@ public record AlertResource(
         String type,
         String severity,
         String message,
-        String timestamp,
+        OffsetDateTime timestamp,
         String status,
         Double value,
         Double threshold

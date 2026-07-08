@@ -17,7 +17,21 @@ public final class CreateQualityAnalysisCommandFromResourceAssembler {
     public static CreateQualityAnalysisCommand toCommandFromResource(CreateQualityAnalysisResource resource) {
         return new CreateQualityAnalysisCommand(
                 resource.sensorSourceId(),
-                AnomalyType.valueOf(resource.detectedParameters().toUpperCase()),
+                parseAnomalyType(resource.detectedParameters()),
                 resource.severityScore());
+    }
+
+    private static AnomalyType parseAnomalyType(String value) {
+        return switch (value == null ? "" : value.trim().toLowerCase()) {
+            case "ph" -> AnomalyType.PH;
+            case "turbidity" -> AnomalyType.TURBIDITY;
+            case "pressure" -> AnomalyType.PRESSURE;
+            case "level" -> AnomalyType.LEVEL;
+            case "chlorine" -> AnomalyType.CHLORINE;
+            case "flow" -> AnomalyType.FLOW;
+            case "dissolvedoxygen", "dissolved_oxygen" -> AnomalyType.DISSOLVED_OXYGEN;
+            case "temperature" -> AnomalyType.TEMPERATURE;
+            default -> throw new IllegalArgumentException("Invalid anomaly type: " + value);
+        };
     }
 }

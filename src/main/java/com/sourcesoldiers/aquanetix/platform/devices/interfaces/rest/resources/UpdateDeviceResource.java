@@ -13,5 +13,9 @@ import java.time.OffsetDateTime;
  */
 public record UpdateDeviceResource(
         @NotBlank String currentStatus,
-        @NotNull OffsetDateTime lastTelemetrySync) {
+        @NotNull OffsetDateTime lastTelemetrySync,
+        String name,
+        String location,
+        String unit,
+        Double currentValue) {
 }

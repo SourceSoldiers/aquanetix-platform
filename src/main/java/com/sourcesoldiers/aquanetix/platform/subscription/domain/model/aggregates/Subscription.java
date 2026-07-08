@@ -33,6 +33,10 @@ public class Subscription {
         this.status = "Active";
     }
 
+    public void changePlan(String newPlan) {
+        this.plan = newPlan;
+    }
+
     public Long getId() {
         return id;
     }

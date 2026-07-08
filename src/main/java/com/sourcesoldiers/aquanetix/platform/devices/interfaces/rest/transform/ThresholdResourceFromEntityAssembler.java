@@ -1,6 +1,7 @@
 package com.sourcesoldiers.aquanetix.platform.devices.interfaces.rest.transform;
 
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.entities.ThresholdConfiguration;
+import com.sourcesoldiers.aquanetix.platform.devices.domain.model.valueobjects.AlertLevel;
 import com.sourcesoldiers.aquanetix.platform.devices.interfaces.rest.resources.ThresholdResource;
 
 /**
@@ -20,6 +21,13 @@ public final class ThresholdResourceFromEntityAssembler {
                 entity.getMinValue(),
                 entity.getMaxValue(),
                 entity.getUnit(),
-                entity.getAlertLevel().name());
+                formatAlertLevel(entity.getAlertLevel()));
+    }
+
+    private static String formatAlertLevel(AlertLevel level) {
+        return switch (level) {
+            case WARNING -> "Warning";
+            case CRITICAL -> "Critical";
+        };
     }
 }

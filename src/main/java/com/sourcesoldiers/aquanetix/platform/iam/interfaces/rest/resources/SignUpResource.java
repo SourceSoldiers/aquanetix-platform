@@ -6,18 +6,18 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * Resource received to register a new IAM user.
  */
 @Schema(
-        name = "SignUpRequest",
-        description = "Public user sign-up request with credentials. The system assigns ROLE_USER by default",
-        example = "{\"username\": \"john.doe\", \"password\": \"SecurePass123!\"}"
+        name = "SignUpResource",
+        description = "Public user sign-up request with credentials and chosen subscription plan",
+        example = "{\"email\": \"john.doe@example.com\", \"password\": \"SecurePass123!\", \"plan\": \"Basic\"}"
 )
 public record SignUpResource(
         @Schema(
-                description = "Desired username",
-                example = "john.doe",
+                description = "User email",
+                example = "john.doe@example.com",
                 minLength = 3,
                 maxLength = 50
         )
-        String username,
+        String email,
 
         @Schema(
                 description = "User password (minimum 8 characters)",
@@ -25,5 +25,8 @@ public record SignUpResource(
                 minLength = 8,
                 maxLength = 255
         )
-        String password) {
+        String password,
+
+        @Schema(description = "Chosen subscription plan", example = "Basic")
+        String plan) {
 }

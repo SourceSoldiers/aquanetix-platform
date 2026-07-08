@@ -1,9 +1,10 @@
 package com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.aggregates;
 
 import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.commands.CreateAlertCommand;
+import com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.commands.UpdateAlertCommand;
 import jakarta.persistence.*;
 import lombok.Getter;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "alert")
@@ -33,22 +34,22 @@ public class Alert {
     private String message;
 
     @Column(nullable = false)
-    private LocalDateTime timestamp;
+    private OffsetDateTime timestamp;
 
     @Column(nullable = false, length = 20)
     private String status;
 
-    @Column(nullable = false)
+    @Column(name = "measured_value", nullable = false)
     private Double value;
 
     @Column(nullable = false)
     private Double threshold;
 
     @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private OffsetDateTime updatedAt;
 
     protected Alert() {}
 
@@ -64,9 +65,9 @@ public class Alert {
         this.threshold = threshold;
 
         this.status = "ACTIVE";
-        this.timestamp = LocalDateTime.now();
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+        this.timestamp = OffsetDateTime.now();
+        this.createdAt = OffsetDateTime.now();
+        this.updatedAt = OffsetDateTime.now();
     }
 
 
@@ -77,18 +78,31 @@ public class Alert {
         this.type = command.type();
         this.severity = command.severity();
         this.message = command.message();
+        this.timestamp = command.timestamp() == null ? OffsetDateTime.now() : command.timestamp();
+        this.status = command.status() == null || command.status().isBlank() ? "Activa" : command.status();
         this.value = command.value();
         this.threshold = command.threshold();
 
-
-        this.status = "ACTIVE";
-        this.timestamp = LocalDateTime.now();
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+        this.createdAt = OffsetDateTime.now();
+        this.updatedAt = OffsetDateTime.now();
     }
 
     public void resolve() {
-        this.status = "RESOLVED";
-        this.updatedAt = LocalDateTime.now();
+        this.status = "Resuelta";
+        this.updatedAt = OffsetDateTime.now();
+    }
+
+    public void update(UpdateAlertCommand command) {
+        this.deviceId = command.deviceId();
+        this.deviceName = command.deviceName();
+        this.location = command.location();
+        this.type = command.type();
+        this.severity = command.severity();
+        this.message = command.message();
+        this.timestamp = command.timestamp();
+        this.status = command.status();
+        this.value = command.value();
+        this.threshold = command.threshold();
+        resolve();
     }
 }

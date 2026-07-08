@@ -11,5 +11,10 @@ import jakarta.validation.constraints.NotNull;
 public record CreateDeviceResource(
         @NotNull Integer ownerId,
         @NotBlank String serialNumber,
-        @NotBlank String deviceType) {
+        @NotBlank String deviceType,
+        String name,
+        String location,
+        String unit,
+        Double currentValue,
+        Long destinationId) {
 }

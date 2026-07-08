@@ -47,7 +47,11 @@ public class User extends AbstractDomainAggregateRoot<User> {
         if (username == null || username.isBlank()) {
             throw new IllegalArgumentException("Username cannot be null or blank");
         }
-        this.username = username.trim();
+        this.username = username.trim().toLowerCase();
+    }
+
+    public String getEmail() {
+        return username;
     }
 
     public void changePasswordHash(PasswordHash passwordHash) {

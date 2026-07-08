@@ -20,6 +20,14 @@ public final class CreateThresholdCommandFromResourceAssembler {
                 resource.minValue(),
                 resource.maxValue(),
                 resource.unit(),
-                AlertLevel.valueOf(resource.alertLevel().toUpperCase()));
+                parseAlertLevel(resource.alertLevel()));
+    }
+
+    private static AlertLevel parseAlertLevel(String value) {
+        return switch (value == null ? "" : value.trim().toLowerCase()) {
+            case "warning" -> AlertLevel.WARNING;
+            case "critical" -> AlertLevel.CRITICAL;
+            default -> throw new IllegalArgumentException("Invalid alert level: " + value);
+        };
     }
 }

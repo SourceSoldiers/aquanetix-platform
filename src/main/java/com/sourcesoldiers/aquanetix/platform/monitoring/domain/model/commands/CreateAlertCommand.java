@@ -1,5 +1,7 @@
 package com.sourcesoldiers.aquanetix.platform.monitoring.domain.model.commands;
 
+import java.time.OffsetDateTime;
+
 public record CreateAlertCommand(
         Long deviceId,
         String deviceName,
@@ -7,6 +9,8 @@ public record CreateAlertCommand(
         String type,
         String severity,
         String message,
+        OffsetDateTime timestamp,
+        String status,
         Double value,
         Double threshold
 ) {
