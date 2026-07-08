@@ -17,15 +17,17 @@ public interface UserCommandService {
      * @param command sign-in command
      * @return authenticated user and token pair, or an application error
      */
+    /*
     Result<ImmutablePair<User, String>, ApplicationError> handle(SignInCommand command);
-
+    */
     /**
      * Handles user sign-up.
      *
      * @param command sign-up command
      * @return created user aggregate, or an application error
      */
+    /*
     Result<User, ApplicationError> handle(SignUpCommand command);
-
+    */
 
 }

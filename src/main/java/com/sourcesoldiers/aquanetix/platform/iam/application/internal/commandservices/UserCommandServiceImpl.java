@@ -39,6 +39,7 @@ public class UserCommandServiceImpl implements UserCommandService {
         this.roleRepository = roleRepository;
     }
 
+    /*
     @Override
     @Transactional
     public Result<ImmutablePair<User, String>, ApplicationError> handle(SignInCommand command) {
@@ -52,7 +53,8 @@ public class UserCommandServiceImpl implements UserCommandService {
         var token = tokenService.generateToken(user.get().getUsername());
         return Result.success(ImmutablePair.of(user.get(), token));
     }
-
+    */
+    /*
     @Override
     @Transactional
     public Result<User, ApplicationError> handle(SignUpCommand command) {
@@ -81,4 +83,5 @@ public class UserCommandServiceImpl implements UserCommandService {
                 .<Result<User, ApplicationError>>map(Result::success)
                 .orElseGet(() -> Result.failure(ApplicationError.unexpected("sign-up", "Created user could not be reloaded")));
     }
+     */
 }
