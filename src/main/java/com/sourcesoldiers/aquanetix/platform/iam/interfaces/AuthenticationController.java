@@ -2,6 +2,11 @@ package com.sourcesoldiers.aquanetix.platform.iam.interfaces;
 
 import com.sourcesoldiers.aquanetix.platform.iam.application.commandservices.UserCommandService;
 import com.sourcesoldiers.aquanetix.platform.iam.interfaces.rest.resources.AuthenticatedUserResource;
+import com.sourcesoldiers.aquanetix.platform.iam.interfaces.rest.resources.SignUpResource;
+import com.sourcesoldiers.aquanetix.platform.iam.interfaces.rest.resources.UserResource;
+import com.sourcesoldiers.aquanetix.platform.iam.interfaces.rest.transform.SignUpCommandFromResourceAssembler;
+import com.sourcesoldiers.aquanetix.platform.iam.interfaces.rest.transform.UserResourceFromEntityAssembler;
+import com.sourcesoldiers.aquanetix.platform.shared.interfaces.rest.transform.ResponseEntityAssembler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -83,7 +88,7 @@ public class AuthenticationController {
      * @param signUpResource the sign-up request body with username, password, and roles.
      * @return the created user resource with assigned roles.
      */
-    /*
+
     @PostMapping("/sign-up")
     @Operation(
             summary = "User registration",
@@ -119,5 +124,5 @@ public class AuthenticationController {
         );
 
     }
-    */
+
 }
