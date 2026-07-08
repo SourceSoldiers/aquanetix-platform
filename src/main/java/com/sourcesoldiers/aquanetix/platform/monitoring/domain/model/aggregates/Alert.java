@@ -39,7 +39,7 @@ public class Alert {
     @Column(nullable = false, length = 20)
     private String status;
 
-    @Column(name = "measured_value", nullable = false)
+    @Column(name = "\"value\"", nullable = false)
     private Double value;
 
     @Column(nullable = false)
