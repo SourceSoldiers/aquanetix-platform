@@ -6,7 +6,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.util.Date;
+import java.time.OffsetDateTime;
 
 /**
  * Base JPA persistence entity for all persistence entities that require auditing.
@@ -17,6 +17,13 @@ import java.util.Date;
  *
  * <p>All bounded-context JPA persistence entities should extend this class
  * instead of placing {@code @Id} and auditing fields directly.</p>
+ *
+ * <p>Timestamps are populated automatically by Spring Data JPA's auditing
+ * infrastructure ({@link AuditingEntityListener}), which requires
+ * {@code @EnableJpaAuditing} to be active &mdash; see
+ * {@code JpaAuditingConfiguration}. This mirrors the {@code AuditableEntityInterceptor}
+ * used in the original C# implementation, but relies on Spring Data's native
+ * auditing hooks instead of a custom EF Core interceptor.</p>
  */
 @Getter
 @MappedSuperclass
@@ -29,11 +36,11 @@ public abstract class AuditableAbstractPersistenceEntity {
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
-    private Date createdAt;
+    private OffsetDateTime createdAt;
 
     @LastModifiedDate
     @Column(nullable = false)
-    private Date updatedAt;
+    private OffsetDateTime updatedAt;
 
     /**
      * Sets the id. Used by assemblers when reconstructing a persistence entity
