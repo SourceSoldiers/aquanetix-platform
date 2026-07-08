@@ -37,6 +37,10 @@ public class Subscription {
         this.plan = newPlan;
     }
 
+    public boolean isActive() {
+        return "Active".equalsIgnoreCase(this.status);
+    }
+
     public Long getId() {
         return id;
     }

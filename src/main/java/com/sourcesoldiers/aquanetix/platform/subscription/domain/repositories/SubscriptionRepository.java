@@ -4,7 +4,14 @@ import com.sourcesoldiers.aquanetix.platform.subscription.domain.model.aggregate
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
+import java.util.List;
 
 public interface SubscriptionRepository extends JpaRepository<Subscription, Long> {
-    Optional<Subscription> findByUserId(Integer userId);
+    List<Subscription> findAllByUserIdOrderByIdDesc(Integer userId);
+
+    Optional<Subscription> findFirstByUserIdAndStatusIgnoreCaseOrderByIdDesc(
+            Integer userId,
+            String status);
+
+    Optional<Subscription> findFirstByUserIdOrderByIdDesc(Integer userId);
 }

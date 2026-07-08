@@ -8,6 +8,7 @@ import com.sourcesoldiers.aquanetix.platform.subscription.domain.model.commands.
 import com.sourcesoldiers.aquanetix.platform.subscription.domain.model.valueobjects.PlanCatalog;
 import com.sourcesoldiers.aquanetix.platform.subscription.domain.repositories.SubscriptionRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import com.sourcesoldiers.aquanetix.platform.subscription.domain.model.commands.CancelSubscriptionCommand;
 import java.util.Optional;
 
@@ -23,11 +24,16 @@ public class SubscriptionCommandServiceImpl
     }
 
     @Override
+    @Transactional
     public Optional<Subscription> handle(
             CreateSubscriptionCommand command) {
 
         if (!PlanCatalog.isValidPlan(command.plan())) {
             return Optional.empty();
+        }
+
+        if ("Active".equalsIgnoreCase(command.status())) {
+            cancelOtherActiveSubscriptions(command.userId(), null);
         }
 
         var subscription = new Subscription(
@@ -41,6 +47,7 @@ public class SubscriptionCommandServiceImpl
         return Optional.of(subscription);
     }
     @Override
+    @Transactional
     public Optional<Subscription> handle(
             CancelSubscriptionCommand command) {
 
@@ -59,6 +66,7 @@ public class SubscriptionCommandServiceImpl
     }
 
     @Override
+    @Transactional
     public Optional<Subscription> handle(
             RenewSubscriptionCommand command) {
 
@@ -69,6 +77,9 @@ public class SubscriptionCommandServiceImpl
             return Optional.empty();
         }
 
+        cancelOtherActiveSubscriptions(
+                subscription.get().getUserId(),
+                subscription.get().getId());
         subscription.get().renew();
 
         repository.save(subscription.get());
@@ -77,6 +88,7 @@ public class SubscriptionCommandServiceImpl
     }
 
     @Override
+    @Transactional
     public Optional<Subscription> handle(
             ChangePlanCommand command) {
 
@@ -91,10 +103,23 @@ public class SubscriptionCommandServiceImpl
             return Optional.empty();
         }
 
+        cancelOtherActiveSubscriptions(
+                subscription.get().getUserId(),
+                subscription.get().getId());
         subscription.get().changePlan(command.newPlan());
+        subscription.get().renew();
 
         repository.save(subscription.get());
 
         return subscription;
+    }
+
+    private void cancelOtherActiveSubscriptions(Integer userId, Long subscriptionToKeep) {
+        repository.findAllByUserIdOrderByIdDesc(userId).stream()
+                .filter(Subscription::isActive)
+                .filter(subscription ->
+                        subscriptionToKeep == null ||
+                        !subscription.getId().equals(subscriptionToKeep))
+                .forEach(Subscription::cancel);
     }
 }

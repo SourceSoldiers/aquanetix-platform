@@ -25,6 +25,8 @@ public class SubscriptionQueryService {
     }
 
     public Optional<Subscription> handleByUserId(Integer userId) {
-        return repository.findByUserId(userId);
+        return repository
+                .findFirstByUserIdAndStatusIgnoreCaseOrderByIdDesc(userId, "Active")
+                .or(() -> repository.findFirstByUserIdOrderByIdDesc(userId));
     }
 }
