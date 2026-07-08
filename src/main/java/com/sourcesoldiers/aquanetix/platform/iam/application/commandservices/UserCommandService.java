@@ -17,9 +17,8 @@ public interface UserCommandService {
      * @param command sign-in command
      * @return authenticated user and token pair, or an application error
      */
-    /*
     Result<ImmutablePair<User, String>, ApplicationError> handle(SignInCommand command);
-    */
+
     /**
      * Handles user sign-up.
      *
