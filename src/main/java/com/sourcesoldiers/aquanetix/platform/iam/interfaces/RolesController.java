@@ -4,6 +4,7 @@ import com.sourcesoldiers.aquanetix.platform.iam.application.queries.GetAllRoles
 import com.sourcesoldiers.aquanetix.platform.iam.application.queryservices.RoleQueryService;
 import com.sourcesoldiers.aquanetix.platform.iam.interfaces.rest.resources.RoleResource;
 import com.sourcesoldiers.aquanetix.platform.iam.interfaces.rest.transform.RoleResourceFromEntityAssembler;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -25,6 +26,7 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/api/v1/roles", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Roles", description = "Role management endpoints")
+@Hidden
 public class RolesController {
     private final RoleQueryService roleQueryService;
 

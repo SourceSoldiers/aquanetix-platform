@@ -3,6 +3,8 @@ package com.sourcesoldiers.aquanetix.platform.devices.application.commandservice
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.aggregates.Device;
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.commands.CreateDeviceCommand;
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.commands.CreateThresholdCommand;
+import com.sourcesoldiers.aquanetix.platform.devices.domain.model.commands.DeleteDeviceCommand;
+import com.sourcesoldiers.aquanetix.platform.devices.domain.model.commands.UpdateDeviceCommand;
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.entities.ThresholdConfiguration;
 import com.sourcesoldiers.aquanetix.platform.shared.application.result.Result;
 
@@ -21,6 +23,10 @@ public interface DeviceCommandService {
      * @return the created device, or a failure message
      */
     Result<Device, String> handle(CreateDeviceCommand command);
+
+    Result<Device, String> handle(UpdateDeviceCommand command);
+
+    Result<Boolean, String> handle(DeleteDeviceCommand command);
 
     /**
      * Creates a new threshold configuration for a device's sensor.

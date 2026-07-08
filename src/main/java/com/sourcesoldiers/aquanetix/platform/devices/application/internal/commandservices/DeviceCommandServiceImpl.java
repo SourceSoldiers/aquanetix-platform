@@ -4,8 +4,11 @@ import com.sourcesoldiers.aquanetix.platform.devices.application.commandservices
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.aggregates.Device;
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.commands.CreateDeviceCommand;
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.commands.CreateThresholdCommand;
+import com.sourcesoldiers.aquanetix.platform.devices.domain.model.commands.DeleteDeviceCommand;
+import com.sourcesoldiers.aquanetix.platform.devices.domain.model.commands.UpdateDeviceCommand;
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.entities.ThresholdConfiguration;
 import com.sourcesoldiers.aquanetix.platform.devices.domain.repositories.DeviceRepository;
+import com.sourcesoldiers.aquanetix.platform.monitoring.domain.repositories.AlertRepository;
 import com.sourcesoldiers.aquanetix.platform.shared.application.result.Result;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -20,22 +23,67 @@ import org.springframework.transaction.annotation.Transactional;
 public class DeviceCommandServiceImpl implements DeviceCommandService {
 
     private final DeviceRepository deviceRepository;
+    private final AlertRepository alertRepository;
 
-    public DeviceCommandServiceImpl(DeviceRepository deviceRepository) {
+    public DeviceCommandServiceImpl(DeviceRepository deviceRepository,
+                                    AlertRepository alertRepository) {
         this.deviceRepository = deviceRepository;
+        this.alertRepository = alertRepository;
     }
 
     @Override
     @Transactional
     public Result<Device, String> handle(CreateDeviceCommand command) {
         try {
-            var device = new Device(command.ownerId(), command.serialNumber(), command.deviceType());
+            var device = new Device(
+                    command.ownerId(),
+                    command.serialNumber(),
+                    command.deviceType(),
+                    command.name(),
+                    command.location(),
+                    command.unit(),
+                    command.currentValue(),
+                    command.destinationId());
             deviceRepository.save(device);
             return Result.success(device);
         } catch (DataIntegrityViolationException ex) {
             return Result.failure("Invalid device data: " + ex.getMostSpecificCause().getMessage());
         } catch (Exception ex) {
             return Result.failure("Could not create the device: " + ex.getMessage());
+        }
+    }
+
+    @Override
+    @Transactional
+    public Result<Device, String> handle(UpdateDeviceCommand command) {
+        var deviceOptional = deviceRepository.findById(command.id());
+        if (deviceOptional.isEmpty()) {
+            return Result.failure("Device with id " + command.id() + " was not found");
+        }
+
+        try {
+            var device = deviceOptional.get();
+            device.update(command);
+            deviceRepository.save(device);
+            return Result.success(device);
+        } catch (Exception ex) {
+            return Result.failure("Could not update the device: " + ex.getMessage());
+        }
+    }
+
+    @Override
+    @Transactional
+    public Result<Boolean, String> handle(DeleteDeviceCommand command) {
+        if (!deviceRepository.existsById(command.id())) {
+            return Result.failure("Device with id " + command.id() + " was not found");
+        }
+
+        try {
+            alertRepository.deleteAll(alertRepository.findAllByDeviceId(command.id()));
+            deviceRepository.deleteById(command.id());
+            return Result.success(true);
+        } catch (Exception ex) {
+            return Result.failure("Could not delete the device: " + ex.getMessage());
         }
     }
 

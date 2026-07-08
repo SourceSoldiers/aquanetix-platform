@@ -18,6 +18,23 @@ public final class CreateDeviceCommandFromResourceAssembler {
         return new CreateDeviceCommand(
                 resource.ownerId(),
                 resource.serialNumber(),
-                DeviceType.valueOf(resource.deviceType().toUpperCase()));
+                parseDeviceType(resource.deviceType()),
+                resource.name(),
+                resource.location(),
+                resource.unit(),
+                resource.currentValue(),
+                resource.destinationId());
+    }
+
+    private static DeviceType parseDeviceType(String value) {
+        return switch (value == null ? "" : value.trim().toLowerCase()) {
+            case "ph" -> DeviceType.PH;
+            case "turbidity" -> DeviceType.TURBIDITY;
+            case "pressure" -> DeviceType.PRESSURE;
+            case "level" -> DeviceType.LEVEL;
+            case "chlorine" -> DeviceType.CHLORINE;
+            case "flow" -> DeviceType.FLOW;
+            default -> throw new IllegalArgumentException("Invalid device type: " + value);
+        };
     }
 }

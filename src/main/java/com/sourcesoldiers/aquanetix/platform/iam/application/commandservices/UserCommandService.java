@@ -26,7 +26,7 @@ public interface UserCommandService {
      * @return created user aggregate, or an application error
      */
 
-    Result<User, ApplicationError> handle(SignUpCommand command);
+    Result<ImmutablePair<User, String>, ApplicationError> handle(SignUpCommand command);
 
 
 }

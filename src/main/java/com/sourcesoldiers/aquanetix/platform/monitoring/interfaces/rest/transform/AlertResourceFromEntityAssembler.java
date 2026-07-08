@@ -14,7 +14,7 @@ public class AlertResourceFromEntityAssembler {
                 entity.getType(),
                 entity.getSeverity(),
                 entity.getMessage(),
-                entity.getTimestamp().toString(),
+                entity.getTimestamp(),
                 entity.getStatus(),
                 entity.getValue(),
                 entity.getThreshold()

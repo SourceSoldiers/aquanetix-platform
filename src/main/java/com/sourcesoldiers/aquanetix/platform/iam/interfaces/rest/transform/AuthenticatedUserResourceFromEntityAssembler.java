@@ -1,6 +1,7 @@
 package com.sourcesoldiers.aquanetix.platform.iam.interfaces.rest.transform;
 
 import com.sourcesoldiers.aquanetix.platform.iam.domain.model.aggregates.User;
+import com.sourcesoldiers.aquanetix.platform.iam.domain.model.entities.Role;
 import com.sourcesoldiers.aquanetix.platform.iam.interfaces.rest.resources.AuthenticatedUserResource;
 
 /**
@@ -15,6 +16,13 @@ public class AuthenticatedUserResourceFromEntityAssembler {
      * @return resource used by the authentication endpoint response
      */
     public static AuthenticatedUserResource toResourceFromEntity(User user, String token) {
-        return new AuthenticatedUserResource(user.getId(), user.getUsername(), token);
+        var role = user.getRoles().stream()
+                .findFirst()
+                .map(Role::getStringName)
+                .map(value -> value.replace("ROLE_", ""))
+                .map(value -> value.charAt(0) + value.substring(1).toLowerCase())
+                .orElse("User");
+
+        return new AuthenticatedUserResource(user.getId(), user.getEmail(), role, token);
     }
 }

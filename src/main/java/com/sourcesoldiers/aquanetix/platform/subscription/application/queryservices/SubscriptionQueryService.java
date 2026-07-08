@@ -5,6 +5,7 @@ import com.sourcesoldiers.aquanetix.platform.subscription.domain.repositories.Su
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.List;
 
 @Service
 public class SubscriptionQueryService {
@@ -17,5 +18,13 @@ public class SubscriptionQueryService {
 
     public Optional<Subscription> handle(Long id) {
         return repository.findById(id);
+    }
+
+    public List<Subscription> handleAll() {
+        return repository.findAll();
+    }
+
+    public Optional<Subscription> handleByUserId(Integer userId) {
+        return repository.findByUserId(userId);
     }
 }

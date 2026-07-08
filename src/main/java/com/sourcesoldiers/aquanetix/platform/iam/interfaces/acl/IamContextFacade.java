@@ -5,10 +5,9 @@ import com.sourcesoldiers.aquanetix.platform.iam.application.commandservices.Use
 import com.sourcesoldiers.aquanetix.platform.iam.application.queries.GetUserByIdQuery;
 import com.sourcesoldiers.aquanetix.platform.iam.application.queries.GetUserByUsernameQuery;
 import com.sourcesoldiers.aquanetix.platform.iam.application.queryservices.UserQueryService;
-import com.sourcesoldiers.aquanetix.platform.iam.domain.model.entities.Role;
+import com.sourcesoldiers.aquanetix.platform.subscription.domain.model.valueobjects.PlanCatalog;
 import org.apache.logging.log4j.util.Strings;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,16 +28,16 @@ public class IamContextFacade {
     /**
      * Creates a new user assigning the default role.
      *
-     * @param username username to register
+     * @param username email to register
      * @param password raw password
      * @return created user identifier, or {@code 0L} when creation fails
      */
 
     public Long createUser(String username, String password) {
-        var signUpCommand = new SignUpCommand(username, password, List.of(Role.getDefaultRole()));
+        var signUpCommand = new SignUpCommand(username, password, PlanCatalog.BASIC);
         var result = userCommandService.handle(signUpCommand);
-        if (result instanceof com.sourcesoldiers.aquanetix.platform.shared.application.result.Result.Success(var user)) {
-            return user.getId();
+        if (result instanceof com.sourcesoldiers.aquanetix.platform.shared.application.result.Result.Success(var auth)) {
+            return auth.getLeft().getId();
         }
         return 0L;
     }
@@ -48,16 +47,15 @@ public class IamContextFacade {
      *
      * @param username username to register
      * @param password raw password
-     * @param roleNames role names to assign; unknown names are ignored
+     * @param roleNames ignored; users are created with the default role, matching public sign-up
      * @return created user identifier, or {@code 0L} when creation fails
      */
 
     public Long createUser(String username, String password, List<String> roleNames) {
-        var roles = roleNames != null ? roleNames.stream().map(Role::toRoleFromName).toList() : new ArrayList<Role>();
-        var signUpCommand = new SignUpCommand(username, password, roles);
+        var signUpCommand = new SignUpCommand(username, password, PlanCatalog.BASIC);
         var result = userCommandService.handle(signUpCommand);
-        if (result instanceof com.sourcesoldiers.aquanetix.platform.shared.application.result.Result.Success(var user)) {
-            return user.getId();
+        if (result instanceof com.sourcesoldiers.aquanetix.platform.shared.application.result.Result.Success(var auth)) {
+            return auth.getLeft().getId();
         }
         return 0L;
     }

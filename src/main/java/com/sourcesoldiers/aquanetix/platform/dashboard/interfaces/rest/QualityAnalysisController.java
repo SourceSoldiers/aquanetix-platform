@@ -32,7 +32,7 @@ import java.util.List;
  * @since 1.0
  */
 @RestController
-@RequestMapping(value = "/api/v1/quality-analyses", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1/quality-analysis", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "QualityAnalysis", description = "Available Quality Analysis endpoints")
 public class QualityAnalysisController {
 
@@ -56,7 +56,7 @@ public class QualityAnalysisController {
         if (result.isSuccess()) {
             var analysis = result.success().orElseThrow();
             var analysisResource = QualityAnalysisResourceFromEntityAssembler.toResourceFromEntity(analysis);
-            return ResponseEntity.created(URI.create("/api/v1/quality-analyses/" + analysis.getId()))
+            return ResponseEntity.created(URI.create("/api/v1/quality-analysis/" + analysis.getId()))
                     .body(analysisResource);
         }
         var message = result.failure().orElseThrow();
@@ -75,18 +75,18 @@ public class QualityAnalysisController {
         return ResponseEntity.ok(resources);
     }
 
-    @GetMapping("/{analysisId}")
+    @GetMapping("/{id}")
     @Operation(summary = "Get quality analysis by id", operationId = "GetQualityAnalysisById")
     @ApiResponse(responseCode = "200", description = "Quality analysis found",
             content = @Content(schema = @Schema(implementation = QualityAnalysisResource.class)))
     @ApiResponse(responseCode = "404", description = "Quality analysis not found")
-    public ResponseEntity<?> getQualityAnalysisById(@PathVariable Long analysisId) {
-        var analysis = qualityAnalysisQueryService.handle(new GetQualityAnalysisByIdQuery(analysisId));
+    public ResponseEntity<?> getQualityAnalysisById(@PathVariable Long id) {
+        var analysis = qualityAnalysisQueryService.handle(new GetQualityAnalysisByIdQuery(id));
         if (analysis.isPresent()) {
             return ResponseEntity.ok(
                     QualityAnalysisResourceFromEntityAssembler.toResourceFromEntity(analysis.get()));
         }
-        return ResponseEntity.status(404).body(new ErrorBody("Quality analysis with id " + analysisId + " not found"));
+        return ResponseEntity.status(404).body(new ErrorBody("Quality analysis with id " + id + " not found"));
     }
 
     private record ErrorBody(String message) {

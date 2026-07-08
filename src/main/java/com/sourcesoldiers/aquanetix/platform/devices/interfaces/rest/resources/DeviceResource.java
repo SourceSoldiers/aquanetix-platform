@@ -13,5 +13,10 @@ public record DeviceResource(
         String serialNumber,
         String deviceType,
         String currentStatus,
-        OffsetDateTime lastTelemetrySync) {
+        OffsetDateTime lastTelemetrySync,
+        String name,
+        String location,
+        String unit,
+        Double currentValue,
+        Long destinationId) {
 }

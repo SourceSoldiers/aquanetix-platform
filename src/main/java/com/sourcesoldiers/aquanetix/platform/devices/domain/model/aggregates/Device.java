@@ -1,6 +1,7 @@
 package com.sourcesoldiers.aquanetix.platform.devices.domain.model.aggregates;
 
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.entities.ThresholdConfiguration;
+import com.sourcesoldiers.aquanetix.platform.devices.domain.model.commands.UpdateDeviceCommand;
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.valueobjects.DeviceStatus;
 import com.sourcesoldiers.aquanetix.platform.devices.domain.model.valueobjects.DeviceType;
 import jakarta.persistence.CascadeType;
@@ -55,6 +56,21 @@ public class Device {
     @Column(name = "last_telemetry_sync", nullable = false)
     private OffsetDateTime lastTelemetrySync;
 
+    @Column(name = "name", length = 100)
+    private String name = "";
+
+    @Column(name = "location", length = 150)
+    private String location = "";
+
+    @Column(name = "unit", length = 20)
+    private String unit = "";
+
+    @Column(name = "current_value")
+    private Double currentValue = 0d;
+
+    @Column(name = "destination_id")
+    private Long destinationId;
+
     @OneToMany(mappedBy = "device", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ThresholdConfiguration> thresholds = new ArrayList<>();
 
@@ -74,6 +90,22 @@ public class Device {
         this.lastTelemetrySync = OffsetDateTime.now();
     }
 
+    public Device(Integer ownerId,
+                  String serialNumber,
+                  DeviceType deviceType,
+                  String name,
+                  String location,
+                  String unit,
+                  Double currentValue,
+                  Long destinationId) {
+        this(ownerId, serialNumber, deviceType);
+        this.name = name != null ? name : "";
+        this.location = location != null ? location : "";
+        this.unit = unit != null ? unit : "";
+        this.currentValue = currentValue != null ? currentValue : 0d;
+        this.destinationId = destinationId;
+    }
+
     public void updateStatus(DeviceStatus newStatus) {
         this.currentStatus = newStatus;
         this.lastTelemetrySync = OffsetDateTime.now();
@@ -86,6 +118,23 @@ public class Device {
     public void addThreshold(ThresholdConfiguration threshold) {
         threshold.assignToDevice(this);
         this.thresholds.add(threshold);
+    }
+
+    public void update(UpdateDeviceCommand command) {
+        this.currentStatus = command.currentStatus();
+        this.lastTelemetrySync = command.lastTelemetrySync();
+        if (command.name() != null) {
+            this.name = command.name();
+        }
+        if (command.location() != null) {
+            this.location = command.location();
+        }
+        if (command.unit() != null) {
+            this.unit = command.unit();
+        }
+        if (command.currentValue() != null) {
+            this.currentValue = command.currentValue();
+        }
     }
 
     public Long getId() {
@@ -110,6 +159,26 @@ public class Device {
 
     public OffsetDateTime getLastTelemetrySync() {
         return lastTelemetrySync;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public Double getCurrentValue() {
+        return currentValue;
+    }
+
+    public Long getDestinationId() {
+        return destinationId;
     }
 
     public List<ThresholdConfiguration> getThresholds() {

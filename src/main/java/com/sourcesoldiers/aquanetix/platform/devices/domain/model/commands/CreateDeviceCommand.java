@@ -10,5 +10,13 @@ import com.sourcesoldiers.aquanetix.platform.devices.domain.model.valueobjects.D
  * @param deviceType   type of sensor the device represents
  * @since 1.0
  */
-public record CreateDeviceCommand(Integer ownerId, String serialNumber, DeviceType deviceType) {
+public record CreateDeviceCommand(
+        Integer ownerId,
+        String serialNumber,
+        DeviceType deviceType,
+        String name,
+        String location,
+        String unit,
+        Double currentValue,
+        Long destinationId) {
 }
