@@ -15,6 +15,7 @@ import com.sourcesoldiers.aquanetix.platform.monitoring.interfaces.rest.transfor
 import com.sourcesoldiers.aquanetix.platform.monitoring.interfaces.rest.transform.UpdateAlertCommandFromResourceAssembler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +39,7 @@ public class AlertsController {
 
     @PostMapping
     @Operation(summary = "Create an alert", operationId = "CreateAlert")
-    public ResponseEntity<AlertResource> createAlert(@RequestBody CreateAlertResource resource) {
+    public ResponseEntity<AlertResource> createAlert(@Valid @RequestBody CreateAlertResource resource) {
         var createAlertCommand = CreateAlertCommandFromResourceAssembler.toCommandFromResource(resource);
         var alert = alertCommandService.handle(createAlertCommand);
 
