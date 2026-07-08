@@ -2,8 +2,11 @@ package com.sourcesoldiers.aquanetix.platform.iam.interfaces;
 
 import com.sourcesoldiers.aquanetix.platform.iam.application.commandservices.UserCommandService;
 import com.sourcesoldiers.aquanetix.platform.iam.interfaces.rest.resources.AuthenticatedUserResource;
+import com.sourcesoldiers.aquanetix.platform.iam.interfaces.rest.resources.SignInResource;
 import com.sourcesoldiers.aquanetix.platform.iam.interfaces.rest.resources.SignUpResource;
 import com.sourcesoldiers.aquanetix.platform.iam.interfaces.rest.resources.UserResource;
+import com.sourcesoldiers.aquanetix.platform.iam.interfaces.rest.transform.AuthenticatedUserResourceFromEntityAssembler;
+import com.sourcesoldiers.aquanetix.platform.iam.interfaces.rest.transform.SignInCommandFromResourceAssembler;
 import com.sourcesoldiers.aquanetix.platform.iam.interfaces.rest.transform.SignUpCommandFromResourceAssembler;
 import com.sourcesoldiers.aquanetix.platform.iam.interfaces.rest.transform.UserResourceFromEntityAssembler;
 import com.sourcesoldiers.aquanetix.platform.shared.interfaces.rest.transform.ResponseEntityAssembler;
@@ -47,7 +50,6 @@ public class AuthenticationController {
      * @param signInResource the sign-in request body with username and password.
      * @return the authenticated user resource with JWT token.
      */
-    /*
     @PostMapping("/sign-in")
     @Operation(
             summary = "User sign-in",
@@ -82,7 +84,6 @@ public class AuthenticationController {
                 HttpStatus.OK
         );
     }
-    */
     /**
      * Handles the sign-up request.
      * @param signUpResource the sign-up request body with username, password, and roles.
