@@ -7,6 +7,7 @@ package com.sourcesoldiers.aquanetix.platform.devices.domain.model.valueobjects;
  * @since 1.0
  */
 public enum AlertLevel {
+    NORMAL,
     WARNING,
     CRITICAL
 }

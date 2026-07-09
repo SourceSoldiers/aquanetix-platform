@@ -26,6 +26,9 @@ import java.time.OffsetDateTime;
 @Table(name = "quality_analyses")
 @NoArgsConstructor(force = true)
 public class QualityAnalysis {
+    private static final double MIN_SEVERITY = 0.0;
+    private static final double MAX_SEVERITY = 10.0;
+    private static final double CONTAMINATION_RISK_THRESHOLD = 8.0;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -60,9 +63,10 @@ public class QualityAnalysis {
     public QualityAnalysis(Integer sensorSourceId, AnomalyType detectedParameters, Double severityScore) {
         this.sensorSourceId = sensorSourceId;
         this.detectedParameters = detectedParameters;
-        this.severityScore = severityScore;
+        this.severityScore = normalizeSeverity(severityScore);
         this.anomalyStatus = AnomalyStatus.DETECTED;
-        this.hasContaminationPeakPrediction = false;
+        this.hasContaminationPeakPrediction =
+                this.severityScore >= CONTAMINATION_RISK_THRESHOLD;
     }
 
     public void evaluateAnomaly() { this.anomalyStatus = AnomalyStatus.EVALUATED; }
@@ -74,8 +78,17 @@ public class QualityAnalysis {
     public Integer getSensorSourceId() { return sensorSourceId; }
     public AnomalyType getDetectedParameters() { return detectedParameters; }
     public AnomalyStatus getAnomalyStatus() { return anomalyStatus; }
-    public Double getSeverityScore() { return severityScore; }
-    public Boolean getHasContaminationPeakPrediction() { return hasContaminationPeakPrediction; }
+    public Double getSeverityScore() { return normalizeSeverity(severityScore); }
+    public Boolean getHasContaminationPeakPrediction() {
+        return getSeverityScore() >= CONTAMINATION_RISK_THRESHOLD;
+    }
     public OffsetDateTime getCreatedAt() { return createdAt; }
     public OffsetDateTime getUpdatedAt() { return updatedAt; }
+
+    private static double normalizeSeverity(Double severity) {
+        if (severity == null) {
+            return MIN_SEVERITY;
+        }
+        return Math.max(MIN_SEVERITY, Math.min(MAX_SEVERITY, severity));
+    }
 }

@@ -26,6 +26,7 @@ public final class ThresholdResourceFromEntityAssembler {
 
     private static String formatAlertLevel(AlertLevel level) {
         return switch (level) {
+            case NORMAL -> "Normal";
             case WARNING -> "Warning";
             case CRITICAL -> "Critical";
         };

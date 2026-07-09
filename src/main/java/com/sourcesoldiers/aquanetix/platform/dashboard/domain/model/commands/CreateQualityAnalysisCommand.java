@@ -7,7 +7,7 @@ import com.sourcesoldiers.aquanetix.platform.dashboard.domain.model.valueobjects
  *
  * @param sensorSourceId    identifier of the sensor that generated the data
  * @param detectedParameters type of anomaly detected
- * @param severityScore     numerical severity score (0-100)
+ * @param severityScore     numerical severity score (0-10)
  * @since 1.0
  */
 public record CreateQualityAnalysisCommand(

@@ -58,6 +58,9 @@ public class SubscriptionCommandServiceImpl
             return Optional.empty();
         }
 
+        repository.findAllByUserIdOrderByIdDesc(subscription.get().getUserId()).stream()
+                .filter(Subscription::isActive)
+                .forEach(Subscription::cancel);
         subscription.get().cancel();
 
         repository.save(subscription.get());

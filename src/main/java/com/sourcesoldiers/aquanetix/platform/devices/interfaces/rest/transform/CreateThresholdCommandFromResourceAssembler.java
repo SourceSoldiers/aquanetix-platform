@@ -25,6 +25,7 @@ public final class CreateThresholdCommandFromResourceAssembler {
 
     private static AlertLevel parseAlertLevel(String value) {
         return switch (value == null ? "" : value.trim().toLowerCase()) {
+            case "", "normal" -> AlertLevel.NORMAL;
             case "warning" -> AlertLevel.WARNING;
             case "critical" -> AlertLevel.CRITICAL;
             default -> throw new IllegalArgumentException("Invalid alert level: " + value);
